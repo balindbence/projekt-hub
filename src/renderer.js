@@ -131,7 +131,10 @@ function selectProject(id) {
   renderNotes();
   renderProjectList();
 
-  $('#pvUrl').value = p.previewUrl || 'http://localhost/';
+  $('#fPreviewMode').value = p.previewMode || 'auto';
+  $('#pvMode').value = p.previewMode || 'auto';
+  $('#pvUrl').value = p.previewUrl || '';
+  $('#pvInfo').textContent = '';
   openFile = null;
   dirty = false;
   $('#openFileName').textContent = 'Válassz egy fájlt balról';
@@ -437,7 +440,8 @@ function bind() {
       id: uid(),
       name: name || baseName($('#nPath').value) || 'Új projekt',
       path: $('#nPath').value.trim(),
-      previewUrl: $('#nPreview').value.trim() || 'http://localhost/',
+      previewUrl: $('#nPreview').value.trim(),
+      previewMode: 'auto',
       progress: 0,
       status: 'planning',
       color: ['#7c5cff', '#4dd4ac', '#f5a524', '#4b8dff', '#f0576b'][STORE.projects.length % 5],
@@ -473,7 +477,8 @@ function bind() {
   const fieldMap = {
     '#fName': 'name', '#fPath': 'path', '#fPreview': 'previewUrl',
     '#fDriveSub': 'driveSubfolder', '#fDesc': 'description',
-    '#projStatus': 'status', '#projDeadline': 'deadline'
+    '#projStatus': 'status', '#projDeadline': 'deadline',
+    '#fPreviewMode': 'previewMode'
   };
   Object.entries(fieldMap).forEach(([sel, key]) => {
     const node = $(sel);
@@ -486,7 +491,8 @@ function bind() {
       if (key === 'path') { $('#projPath').textContent = p.path; loadTree(); }
       if (key === 'deadline') renderDeadline(p);
       if (key === 'status') renderProjectList();
-      if (key === 'previewUrl') $('#pvUrl').value = p.previewUrl;
+      if (key === 'previewUrl' && $('#pvMode').value === 'url') $('#pvUrl').value = p.previewUrl;
+      if (key === 'previewMode') { $('#pvMode').value = p.previewMode; openPreview(); }
     });
   });
 
@@ -544,9 +550,19 @@ function bind() {
   });
 
   // elonezet
-  $('#btnPvGo').addEventListener('click', openPreview);
-  $('#pvUrl').addEventListener('keydown', (e) => { if (e.key === 'Enter') openPreview(); });
+  $('#btnPvGo').addEventListener('click', goToTypedUrl);
+  $('#pvUrl').addEventListener('keydown', (e) => { if (e.key === 'Enter') goToTypedUrl(); });
   $('#btnPvReload').addEventListener('click', () => { try { $('#pvView').reload(); } catch (e) {} });
+  $('#pvMode').addEventListener('change', () => {
+    const p = project();
+    if (p) {
+      p.previewMode = $('#pvMode').value;
+      $('#fPreviewMode').value = p.previewMode;
+      if (p.previewMode === 'url') $('#pvUrl').value = p.previewUrl || '';
+      touch(p); scheduleSave();
+    }
+    openPreview();
+  });
   $('#btnPvBack').addEventListener('click', () => { try { if ($('#pvView').canGoBack()) $('#pvView').goBack(); } catch (e) {} });
   $('#btnPvFwd').addEventListener('click', () => { try { if ($('#pvView').canGoForward()) $('#pvView').goForward(); } catch (e) {} });
   $('#btnPvExternal').addEventListener('click', () => window.api.open.external($('#pvUrl').value));
@@ -675,15 +691,83 @@ function bind() {
   }));
 }
 
-function openPreview() {
-  let url = ($('#pvUrl').value || '').trim();
-  if (!url) return;
-  if (!/^https?:\/\//i.test(url)) { url = 'http://' + url; $('#pvUrl').value = url; }
+function navigate(url) {
   const wv = $('#pvView');
   try {
     if (wv.getURL && wv.getURL() === url) wv.reload();
     else wv.src = url;
   } catch (e) { wv.src = url; }
+}
+
+function withScheme(u) {
+  return /^https?:\/\//i.test(u) ? u : 'http://' + u;
+}
+
+function goToTypedUrl() {
+  const raw = ($('#pvUrl').value || '').trim();
+  if (!raw) return;
+  const url = withScheme(raw);
+  $('#pvUrl').value = url;
+  navigate(url);
+}
+
+async function openPreview() {
+  const p = project();
+  const info = $('#pvInfo');
+  const mode = $('#pvMode').value || 'auto';
+
+  if (mode === 'url') {
+    const raw = ($('#pvUrl').value || (p && p.previewUrl) || '').trim();
+    if (!raw) {
+      info.textContent = 'Írj be egy címet — pl. http://localhost/projektnev — és nyomd meg a Megnyit gombot.';
+      return;
+    }
+    const url = withScheme(raw);
+    $('#pvUrl').value = url;
+    info.textContent = 'Saját URL — ehhez futnia kell a szervernek (XAMPP esetén az Apache-nak).';
+    navigate(url);
+    return;
+  }
+
+  if (!p || !p.path) {
+    info.textContent = 'Ehhez a projekthez nincs mappa megadva — az Áttekintés fülön add meg.';
+    return;
+  }
+
+  let useServer = true;
+  let insp = null;
+  if (mode === 'auto') {
+    const r = await window.api.preview.inspect(p.path);
+    if (r.ok) {
+      insp = r.data;
+      if (!insp.exists) {
+        info.textContent = 'A projekt mappája nem található: ' + p.path;
+        return;
+      }
+      if (insp.hasPhp) useServer = false;
+    }
+  }
+
+  if (!useServer) {
+    const raw = (p.previewUrl || '').trim();
+    if (!raw) {
+      info.textContent = 'PHP-fájlokat találtam, ezekhez XAMPP kell. Add meg az Áttekintés fülön az előnézet URL-t (pl. http://localhost/' + baseName(p.path) + ').';
+      return;
+    }
+    const url = withScheme(raw);
+    $('#pvUrl').value = url;
+    info.textContent = 'PHP-t találtam a projektben → XAMPP-on keresztül nyitom meg. Fusson az Apache!';
+    navigate(url);
+    return;
+  }
+
+  const r = await window.api.preview.serve(p.path);
+  if (!r.ok) { info.textContent = r.error; return; }
+  $('#pvUrl').value = r.data.url;
+  info.textContent = insp && !insp.hasIndex
+    ? 'Beépített szerver fut, de nincs index.html a mappa gyökerében — írd a címsorba a fájl nevét.'
+    : 'Beépített szerver — nem kell XAMPP. A mappádat szolgálja ki: ' + p.path;
+  navigate(r.data.url);
 }
 
 /* ---------------------- indulas ---------------------- */

@@ -1,6 +1,6 @@
 {
   "name": "projekt-hub",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sajat projekt-vezerlopult: haladas, jegyzetek, beepitett szerkeszto, XAMPP es Drive egy helyen.",
   "main": "main.js",
   "scripts": {
@@ -44,8 +44,18 @@
     "win": {
       "icon": "build/icon.ico",
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "nsis": {
@@ -63,7 +73,9 @@
     "linux": {
       "icon": "build/icon.png",
       "category": "Development",
-      "target": ["dir"]
+      "target": [
+        "dir"
+      ]
     }
   }
 }

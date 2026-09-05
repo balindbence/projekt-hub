@@ -39,6 +39,9 @@ Fejlesztéshez, telepítő nélkül: `npm start` (vagy `Inditas.bat`).
 
 Egyszeri beállítás:
 
+Előbb dupla katt a **`Github-elokeszites.bat`** fájlra — ez teszi a helyére a
+`.github\workflows\build.yml`-t (ez mondja meg a GitHubnak, hogyan építse az appot).
+
 ```
 cd C:\Users\Bence\source\projekt-hub
 git init
@@ -95,8 +98,16 @@ a projektmappát a VSCodiumban.
 **Jegyzetek** — ide írod fel, ha egy funkció kimaradt. Típus (teendő / ötlet / hiba /
 kimaradt funkció) és prioritás. A nyitott elemek száma a fülön és a projektlistában is látszik.
 
-**Előnézet** — az oldalad az appon belül nyílik meg (`http://localhost/…`), vissza/előre/frissítés
-gombokkal. A phpMyAdmin is itt fut, nem külön ablakban.
+**Előnézet** — az oldalad az appon belül nyílik meg, vissza/előre/frissítés gombokkal.
+Három mód közül választhatsz a fenti legördülőben:
+
+- **Automatikus** (alapértelmezett) — megnézi a projektet: ha talál `.php` fájlt, a megadott
+  XAMPP-címet nyitja meg; ha csak HTML/CSS/JS van, a beépített szervert használja.
+- **Beépített szerver** — az app saját mini webszervere szolgálja ki a projektmappát egy szabad
+  localhost porton. Sima HTML oldalhoz **nem kell XAMPP**, nem kell a htdocs-ba másolni semmit.
+- **Saját URL / XAMPP** — a megadott címet tölti be (PHP, adatbázis, vagy máshol futó szerver).
+
+A phpMyAdmin is itt fut, nem külön ablakban.
 
 **Eszközök** — Apache és MySQL indítása/leállítása, élő státusz (a 80-as és 3306-os port
 figyelésével), XAMPP vezérlőpult, projektmappa, parancssor a projektben, Drive-műveletek, napló.

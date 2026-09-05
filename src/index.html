@@ -129,7 +129,15 @@
               </div>
             </label>
             <label class="field">
-              <span>Előnézet URL</span>
+              <span>Előnézet módja</span>
+              <select id="fPreviewMode">
+                <option value="auto">Automatikus — PHP esetén XAMPP, egyébként beépített szerver</option>
+                <option value="server">Mindig a beépített szerver (sima HTML oldalhoz)</option>
+                <option value="url">Mindig a saját URL (XAMPP / máshol futó szerver)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Saját előnézet URL — csak XAMPP / külső szerver esetén</span>
               <input id="fPreview" type="text" class="mono" placeholder="http://localhost/projektnev" />
             </label>
             <label class="field">
@@ -217,10 +225,16 @@
           <button id="btnPvBack" class="icon-btn" title="Vissza">←</button>
           <button id="btnPvFwd" class="icon-btn" title="Előre">→</button>
           <button id="btnPvReload" class="icon-btn" title="Újratöltés">⟳</button>
+          <select id="pvMode" class="pv-mode" title="Honnan jöjjön az oldal?">
+            <option value="auto">Automatikus</option>
+            <option value="server">Beépített szerver</option>
+            <option value="url">Saját URL / XAMPP</option>
+          </select>
           <input id="pvUrl" type="text" class="mono" />
           <button id="btnPvGo" class="tool-btn">Megnyit</button>
           <button id="btnPvExternal" class="ghost-btn" title="Külső böngészőben">↗</button>
         </div>
+        <div id="pvInfo" class="preview-info muted small"></div>
         <div class="preview-body">
           <webview id="pvView" src="about:blank" allowpopups></webview>
         </div>

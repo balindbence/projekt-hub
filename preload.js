@@ -41,6 +41,11 @@ contextBridge.exposeInMainWorld('api', {
     upload: (payload) => call('drive:upload', payload),
     openFolder: (p) => call('drive:openFolder', p)
   },
+  preview: {
+    inspect: (root) => call('preview:inspect', root),
+    serve: (root) => call('preview:serve', root),
+    stop: (root) => call('preview:stop', root)
+  },
   platform: process.platform,
   sep: process.platform === 'win32' ? '\\' : '/'
 });

@@ -6,6 +6,7 @@ const fs = require('fs');
 const fsp = require('fs/promises');
 const os = require('os');
 const { spawn, exec } = require('child_process');
+const http = require('http');
 const netSocket = require('net');
 const { pathToFileURL } = require('url');
 
@@ -85,7 +86,19 @@ const MIME = {
   '.ttf': 'font/ttf',
   '.map': 'application/json; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
-  '.md': 'text/plain; charset=utf-8'
+  '.md': 'text/plain; charset=utf-8',
+  '.webp': 'image/webp',
+  '.avif': 'image/avif',
+  '.bmp': 'image/bmp',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+  '.ogg': 'audio/ogg',
+  '.eot': 'application/vnd.ms-fontobject',
+  '.otf': 'font/otf',
+  '.wasm': 'application/wasm',
+  '.pdf': 'application/pdf'
 };
 function mimeOf(p) {
   return MIME[path.extname(p).toLowerCase()] || 'application/octet-stream';
@@ -211,6 +224,87 @@ async function copyDir(src, dest, stats) {
       stats.bytes += (await fsp.stat(d)).size;
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Beepitett elonezet-szerver (sima HTML oldalakhoz, XAMPP nelkul)
+// ---------------------------------------------------------------------------
+const previewServers = new Map(); // root -> { server, port }
+
+function startPreviewServer(root) {
+  const key = path.normalize(root);
+  const existing = previewServers.get(key);
+  if (existing) return Promise.resolve(existing.port);
+
+  const server = http.createServer(async (req, res) => {
+    try {
+      let urlPath = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+      if (urlPath.endsWith('/')) urlPath += 'index.html';
+      let target = path.normalize(path.join(key, urlPath));
+      if (target !== key && !target.startsWith(key + path.sep)) {
+        res.writeHead(403); return res.end('Forbidden');
+      }
+      let st = await fsp.stat(target).catch(() => null);
+      if (st && st.isDirectory()) {
+        target = path.join(target, 'index.html');
+        st = await fsp.stat(target).catch(() => null);
+      }
+      if (!st) {
+        res.writeHead(404, { 'content-type': 'text/html; charset=utf-8' });
+        return res.end('<body style="font-family:system-ui;padding:40px;color:#444">'
+          + '<h2>404 &mdash; nincs ilyen fajl</h2><p><code>' + urlPath + '</code></p>'
+          + '<p>Van index.html a projekt mappajaban?</p></body>');
+      }
+      const buf = await fsp.readFile(target);
+      res.writeHead(200, { 'content-type': mimeOf(target), 'cache-control': 'no-store' });
+      res.end(buf);
+    } catch (e) {
+      res.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' });
+      res.end(String((e && e.message) || e));
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const port = server.address().port;
+      previewServers.set(key, { server, port });
+      resolve(port);
+    });
+  });
+}
+
+function stopPreviewServer(root) {
+  const key = path.normalize(root || '');
+  const rec = previewServers.get(key);
+  if (rec) { try { rec.server.close(); } catch (e) {} previewServers.delete(key); }
+}
+
+function stopAllPreviewServers() {
+  for (const [, rec] of previewServers) { try { rec.server.close(); } catch (e) {} }
+  previewServers.clear();
+}
+
+// Mit tartalmaz a projekt? Ez donti el az "automatikus" modot.
+async function inspectProject(root) {
+  const out = { hasIndex: false, hasPhp: false, exists: false };
+  try {
+    const entries = await fsp.readdir(root, { withFileTypes: true });
+    out.exists = true;
+    for (const e of entries) {
+      const low = e.name.toLowerCase();
+      if (e.isFile() && (low === 'index.html' || low === 'index.htm')) out.hasIndex = true;
+      if (e.isFile() && low.endsWith('.php')) out.hasPhp = true;
+    }
+    if (!out.hasPhp) {
+      for (const e of entries) {
+        if (!e.isDirectory() || SKIP_DIRS.has(e.name) || e.name.startsWith('.')) continue;
+        const sub = await fsp.readdir(path.join(root, e.name)).catch(() => []);
+        if (sub.some((n) => n.toLowerCase().endsWith('.php'))) { out.hasPhp = true; break; }
+      }
+    }
+  } catch (e) { /* nincs mappa */ }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -492,3 +586,22 @@ ipcMain.handle('drive:upload', async (_e, { source, driveFolder, subfolder, file
 ipcMain.handle('drive:openFolder', async (_e, p) => {
   try { shell.openPath(p); return ok(true); } catch (e) { return fail(e); }
 });
+
+// --- Beepitett elonezet ---------------------------------------------------
+ipcMain.handle('preview:inspect', async (_e, root) => {
+  try { return ok(await inspectProject(root)); } catch (e) { return fail(e); }
+});
+
+ipcMain.handle('preview:serve', async (_e, root) => {
+  try {
+    if (!root || !fs.existsSync(root)) return fail(new Error('A projekt mappaja nem letezik: ' + root));
+    const port = await startPreviewServer(root);
+    return ok({ url: 'http://127.0.0.1:' + port + '/', port });
+  } catch (e) { return fail(e); }
+});
+
+ipcMain.handle('preview:stop', async (_e, root) => {
+  try { stopPreviewServer(root); return ok(true); } catch (e) { return fail(e); }
+});
+
+app.on('before-quit', stopAllPreviewServers);
