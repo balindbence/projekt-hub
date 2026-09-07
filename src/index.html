@@ -9,272 +9,370 @@
 
 <div id="app">
 
-  <!-- ================= OLDALSAV ================= -->
-  <aside id="sidebar">
+  <!-- ===================== OLDALSAV ===================== -->
+  <aside id="side">
     <div class="brand">
-      <div class="logo">PH</div>
-      <div>
-        <div class="brand-title">Projekt Hub</div>
-        <div class="brand-sub">a sajat vezerlopultod</div>
-      </div>
+      <div class="mark">PH</div>
+      <div class="brand-t">Projekt Hub</div>
     </div>
 
-    <div class="side-search">
-      <input id="searchInput" type="search" placeholder="Keresés a projektek közt…" />
+    <div class="srch">
+      <input id="searchInput" type="search" placeholder="Keresés…" />
     </div>
 
-    <div class="side-head">
+    <div class="sh">
       <span>Projektek</span>
-      <button id="btnNewProject" class="icon-btn" title="Új projekt">+</button>
+      <span id="projCount" class="cnt">0</span>
+      <button id="btnNewProject" class="plus" title="Új projekt">+</button>
     </div>
 
-    <div id="projectList" class="project-list"></div>
+    <div id="projectList" class="plist"></div>
 
-    <div class="side-foot">
-      <button id="btnSettings" class="ghost-btn wide">⚙️ Beállítások</button>
+    <div class="sfoot">
+      <div id="meAvatar" class="me">?</div>
+      <div id="meName" class="nm">—</div>
+      <button id="btnSettings" class="gear" title="Beállítások">⚙</button>
     </div>
   </aside>
 
-  <!-- ================= FOTARTALOM ================= -->
+  <!-- ===================== FOTARTALOM ===================== -->
   <main id="main">
 
     <div id="emptyState" class="empty">
-      <div class="empty-icon">🗂️</div>
+      <div class="empty-ic">◇</div>
       <h1>Még nincs projekted</h1>
-      <p>Vegyél fel egyet — utána egy helyről tudod indítani a VSCodiumot, a XAMPP-ot,<br />nézni az előnézetet, jegyzetelni és feltölteni a Drive-ra.</p>
-      <button id="btnNewProjectEmpty" class="primary-btn">Első projekt hozzáadása</button>
+      <p>Vegyél fel egyet — utána egy helyről indul a VSCodium és a XAMPP,<br />
+         itt jegyzetelsz, itt nézed az előnézetet, és innen tölthetsz a Drive-ra.</p>
+      <button id="btnNewProjectEmpty" class="btn pri">Első projekt hozzáadása</button>
     </div>
 
     <div id="workspace" class="hidden">
 
-      <header id="topbar">
-        <div class="topbar-left">
-          <span id="projDot" class="proj-dot"></span>
-          <div>
-            <h1 id="projName">—</h1>
-            <div id="projPath" class="muted small mono"></div>
-          </div>
+      <div id="top">
+        <div class="t-l">
+          <h1 id="projName">—</h1>
+          <div id="projPath" class="pth"></div>
         </div>
-
-        <div class="topbar-right">
-          <div id="xamppPills" class="pills">
-            <span class="pill" id="pillApache"><i></i>Apache</span>
-            <span class="pill" id="pillMysql"><i></i>MySQL</span>
-          </div>
-          <button id="btnOpenCodium" class="tool-btn" title="Projekt megnyitása VSCodiumban">VSCodium</button>
-          <button id="btnUploadDrive" class="tool-btn accent" title="Feltöltés a Drive mappába">⬆ Drive</button>
+        <div class="t-r">
+          <span class="svc-pill" id="pillApache"><i></i>Apache</span>
+          <span class="svc-pill" id="pillMysql"><i></i>MySQL</span>
+          <button id="btnOpenCodium" class="btn" title="Projekt megnyitása VSCodiumban">VSCodium</button>
+          <button id="btnUploadDrive" class="btn" title="Feltöltés a Drive mappába">Drive</button>
         </div>
-      </header>
+      </div>
 
       <nav id="tabs">
-        <button class="tab active" data-tab="overview">Áttekintés</button>
-        <button class="tab" data-tab="editor">Kód</button>
-        <button class="tab" data-tab="notes">Jegyzetek <span id="notesBadge" class="badge">0</span></button>
-        <button class="tab" data-tab="preview">Előnézet</button>
-        <button class="tab" data-tab="tools">Eszközök</button>
+        <button class="tb on" data-tab="overview">Áttekintés</button>
+        <button class="tb" data-tab="notes">Jegyzetek <span id="notesBadge" class="bdg">0</span></button>
+        <button class="tb" data-tab="editor">Kód</button>
+        <button class="tb" data-tab="preview">Előnézet</button>
+        <button class="tb" data-tab="share">Megosztás <span id="shareDot" class="dotnew hidden"></span></button>
+        <button class="tb" data-tab="tools">Eszközök</button>
       </nav>
 
       <!-- ---------- ATTEKINTES ---------- -->
-      <section class="panel active" data-panel="overview">
-        <div class="grid2">
-          <div class="card">
-            <h2>Haladás</h2>
-            <div class="progress-big">
+      <section class="pane on" data-panel="overview">
+        <div class="strip">
+          <div class="st">
+            <div class="lbl">Haladás</div>
+            <div class="ringwrap">
               <div class="ring">
-                <svg viewBox="0 0 120 120">
-                  <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
-                  <circle id="ringFg" class="ring-fg" cx="60" cy="60" r="52"></circle>
+                <svg viewBox="0 0 58 58">
+                  <circle class="rbg" cx="29" cy="29" r="24"></circle>
+                  <circle id="ringFg" class="rfg" cx="29" cy="29" r="24"></circle>
                 </svg>
-                <div id="ringLabel" class="ring-label">0%</div>
+                <div id="ringLabel" class="lb">0%</div>
               </div>
-              <div class="progress-controls">
+              <div class="slider">
                 <input id="progressRange" type="range" min="0" max="100" step="1" value="0" />
-                <div class="step-row">
+                <div class="chips">
                   <button class="chip" data-setprog="0">0</button>
                   <button class="chip" data-setprog="25">25</button>
                   <button class="chip" data-setprog="50">50</button>
                   <button class="chip" data-setprog="75">75</button>
                   <button class="chip" data-setprog="100">100</button>
                 </div>
-                <label class="field">
-                  <span>Állapot</span>
-                  <select id="projStatus">
-                    <option value="planning">Tervezés</option>
-                    <option value="in_progress">Folyamatban</option>
-                    <option value="review">Átnézés / tesztelés</option>
-                    <option value="done">Kész</option>
-                    <option value="paused">Szünetel</option>
-                  </select>
-                </label>
-                <label class="field">
-                  <span>Határidő</span>
-                  <input id="projDeadline" type="date" />
-                </label>
-                <div id="deadlineHint" class="muted small"></div>
               </div>
             </div>
+          </div>
+          <div class="st">
+            <div class="lbl">Állapot</div>
+            <div id="stStatus" class="val">—</div>
+            <div id="stStatusSub" class="sub"></div>
+          </div>
+          <div class="st">
+            <div class="lbl">Határidő</div>
+            <div id="stDeadline" class="val">—</div>
+            <div id="stDeadlineSub" class="sub"></div>
+          </div>
+          <div class="st">
+            <div class="lbl">Nyitott teendő</div>
+            <div id="stTodos" class="val">0</div>
+            <div id="stTodosSub" class="sub"></div>
+          </div>
+        </div>
+
+        <div class="cols">
+          <div class="card">
+            <div class="hd">
+              <h2>Nyitott teendők <span id="ovCount" class="n"></span></h2>
+              <button id="btnAllNotes" class="btn sm gh">Mind →</button>
+            </div>
+            <div id="overviewNotes"></div>
           </div>
 
           <div class="card">
             <h2>Projekt adatai</h2>
-            <label class="field">
-              <span>Név</span>
-              <input id="fName" type="text" />
+            <label class="f"><span>Név</span><input id="fName" type="text" /></label>
+            <label class="f"><span>Mappa</span>
+              <div class="rw"><input id="fPath" type="text" class="mono" />
+                <button id="btnPickPath" class="btn">Tallóz</button></div>
             </label>
-            <label class="field">
-              <span>Mappa</span>
-              <div class="row">
-                <input id="fPath" type="text" class="mono" />
-                <button id="btnPickPath" class="ghost-btn">Tallóz</button>
-              </div>
-            </label>
-            <label class="field">
-              <span>Előnézet módja</span>
-              <select id="fPreviewMode">
-                <option value="auto">Automatikus — PHP esetén XAMPP, egyébként beépített szerver</option>
-                <option value="server">Mindig a beépített szerver (sima HTML oldalhoz)</option>
-                <option value="url">Mindig a saját URL (XAMPP / máshol futó szerver)</option>
+            <label class="f"><span>Állapot</span>
+              <select id="projStatus">
+                <option value="planning">Tervezés</option>
+                <option value="in_progress">Folyamatban</option>
+                <option value="review">Átnézés / tesztelés</option>
+                <option value="done">Kész</option>
+                <option value="paused">Szünetel</option>
               </select>
             </label>
-            <label class="field">
-              <span>Saját előnézet URL — csak XAMPP / külső szerver esetén</span>
-              <input id="fPreview" type="text" class="mono" placeholder="http://localhost/projektnev" />
+            <label class="f"><span>Határidő</span><input id="projDeadline" type="date" /></label>
+            <label class="f"><span>Előnézet módja</span>
+              <select id="fPreviewMode">
+                <option value="auto">Automatikus — PHP-hoz XAMPP, egyébként beépített szerver</option>
+                <option value="server">Mindig a beépített szerver</option>
+                <option value="url">Mindig a saját URL (XAMPP / külső szerver)</option>
+              </select>
             </label>
-            <label class="field">
-              <span>Drive almappa</span>
-              <input id="fDriveSub" type="text" class="mono" placeholder="Suli/Web/Portfolio" />
-            </label>
-            <label class="field">
-              <span>Leírás</span>
-              <textarea id="fDesc" rows="4" placeholder="Miről szól ez a projekt?"></textarea>
-            </label>
-            <div class="row end">
-              <button id="btnDeleteProject" class="danger-btn">Projekt törlése</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Nyitott teendők</h2>
-          <div id="overviewNotes" class="mini-notes"></div>
-        </div>
-      </section>
-
-      <!-- ---------- KOD ---------- -->
-      <section class="panel" data-panel="editor">
-        <div class="editor-wrap">
-          <div class="file-pane">
-            <div class="file-head">
-              <span>Fájlok</span>
-              <div>
-                <button id="btnNewFile" class="icon-btn" title="Új fájl">+</button>
-                <button id="btnRefreshTree" class="icon-btn" title="Frissítés">⟳</button>
-              </div>
-            </div>
-            <div id="fileTree" class="file-tree"></div>
-          </div>
-          <div class="code-pane">
-            <div class="code-head">
-              <span id="openFileName" class="mono muted">Válassz egy fájlt balról</span>
-              <div class="row">
-                <span id="dirtyDot" class="dirty hidden" title="Nem mentett változás"></span>
-                <button id="btnSaveFile" class="tool-btn" disabled>Mentés (Ctrl+S)</button>
-              </div>
-            </div>
-            <div id="monaco"></div>
-            <div id="editorPlaceholder" class="editor-placeholder">
-              <p>Itt egy beépített VS Code-motoros szerkesztő fut.<br />Gyors javításokhoz tökéletes — nagyobb munkához nyisd meg a VSCodiumot fent.</p>
-            </div>
+            <label class="f"><span>Saját előnézet URL</span>
+              <input id="fPreview" type="text" class="mono" placeholder="http://localhost/projektnev" /></label>
+            <label class="f"><span>Drive almappa</span>
+              <input id="fDriveSub" type="text" class="mono" placeholder="Suli/Web/Portfolio" /></label>
+            <label class="f"><span>Leírás</span>
+              <textarea id="fDesc" rows="3" placeholder="Miről szól ez a projekt?"></textarea></label>
+            <div class="rw end"><button id="btnDeleteProject" class="btn dgr sm">Projekt törlése</button></div>
           </div>
         </div>
       </section>
 
       <!-- ---------- JEGYZETEK ---------- -->
-      <section class="panel" data-panel="notes">
+      <section class="pane" data-panel="notes">
         <div class="card">
-          <h2>Új jegyzet / lábjegyzet</h2>
-          <div class="note-form">
-            <input id="noteText" type="text" placeholder="Pl.: sötét mód gomb kimaradt a fejlécből" />
-            <select id="noteType">
-              <option value="todo">Teendő</option>
-              <option value="idea">Ötlet</option>
-              <option value="bug">Hiba</option>
-              <option value="missing">Kimaradt funkció</option>
-            </select>
-            <select id="notePrio">
-              <option value="normal">Normál</option>
-              <option value="high">Fontos</option>
-              <option value="low">Ráér</option>
-            </select>
-            <button id="btnAddNote" class="primary-btn">Hozzáad</button>
-          </div>
+          <label class="f nomb"><span>Új jegyzet</span>
+            <div class="rw">
+              <input id="noteText" type="text" placeholder="Pl.: sötét mód gomb kimaradt a fejlécből" />
+              <select id="noteType" class="narrow">
+                <option value="todo">Teendő</option>
+                <option value="idea">Ötlet</option>
+                <option value="bug">Hiba</option>
+                <option value="missing">Kimaradt funkció</option>
+              </select>
+              <select id="notePrio" class="narrow">
+                <option value="normal">Normál</option>
+                <option value="high">Fontos</option>
+                <option value="low">Ráér</option>
+              </select>
+              <button id="btnAddNote" class="btn pri">Hozzáad</button>
+            </div>
+          </label>
         </div>
 
         <div class="card">
-          <div class="row between">
-            <h2>Lista</h2>
-            <label class="checkline"><input id="showDone" type="checkbox" /> Kész elemek is</label>
+          <div class="hd">
+            <h2>Lista <span id="noteCount" class="n"></span></h2>
+            <div class="rw">
+              <select id="noteWho" class="narrow tiny hidden"><option value="">Mindenki</option></select>
+              <label class="chk"><input id="showDone" type="checkbox" /> Kész elemek is</label>
+            </div>
           </div>
-          <div id="noteList" class="note-list"></div>
+          <div id="noteList"></div>
+        </div>
+      </section>
+
+      <!-- ---------- KOD ---------- -->
+      <section class="pane flat" data-panel="editor">
+        <div class="edwrap">
+          <div class="fpane">
+            <div class="fhead">
+              <span>Fájlok</span>
+              <div class="rw">
+                <button id="btnNewFile" class="ibtn" title="Új fájl">+</button>
+                <button id="btnRefreshTree" class="ibtn" title="Frissítés">⟳</button>
+              </div>
+            </div>
+            <div id="fileTree" class="ftree"></div>
+          </div>
+          <div class="cpane">
+            <div class="chead">
+              <span id="openFileName" class="mono dim">Válassz egy fájlt balról</span>
+              <div class="rw">
+                <span id="dirtyDot" class="dirty hidden" title="Nem mentett változás"></span>
+                <button id="btnSaveFile" class="btn sm" disabled>Mentés (Ctrl+S)</button>
+              </div>
+            </div>
+            <div id="monaco"></div>
+            <div id="editorPlaceholder" class="edph">
+              <p>Beépített VS Code-motoros szerkesztő.<br />
+                 Gyors javításokhoz jó — nagyobb munkához nyisd meg fent a VSCodiumot.</p>
+            </div>
+          </div>
         </div>
       </section>
 
       <!-- ---------- ELONEZET ---------- -->
-      <section class="panel" data-panel="preview">
-        <div class="preview-bar">
-          <button id="btnPvBack" class="icon-btn" title="Vissza">←</button>
-          <button id="btnPvFwd" class="icon-btn" title="Előre">→</button>
-          <button id="btnPvReload" class="icon-btn" title="Újratöltés">⟳</button>
-          <select id="pvMode" class="pv-mode" title="Honnan jöjjön az oldal?">
+      <section class="pane flat" data-panel="preview">
+        <div class="pvbar">
+          <button id="btnPvBack" class="ibtn" title="Vissza">←</button>
+          <button id="btnPvFwd" class="ibtn" title="Előre">→</button>
+          <button id="btnPvReload" class="ibtn" title="Újratöltés">⟳</button>
+          <select id="pvMode" class="narrow">
             <option value="auto">Automatikus</option>
             <option value="server">Beépített szerver</option>
             <option value="url">Saját URL / XAMPP</option>
           </select>
           <input id="pvUrl" type="text" class="mono" />
-          <button id="btnPvGo" class="tool-btn">Megnyit</button>
-          <button id="btnPvExternal" class="ghost-btn" title="Külső böngészőben">↗</button>
+          <button id="btnPvGo" class="btn">Megnyit</button>
+          <button id="btnPvExternal" class="ibtn" title="Külső böngészőben">↗</button>
         </div>
-        <div id="pvInfo" class="preview-info muted small"></div>
-        <div class="preview-body">
+        <div id="pvInfo" class="pvinfo"></div>
+        <div class="pvbody">
           <webview id="pvView" src="about:blank" allowpopups></webview>
         </div>
       </section>
 
+      <!-- ---------- MEGOSZTAS ---------- -->
+      <section class="pane" data-panel="share">
+
+        <!-- meg nincs megosztva -->
+        <div id="shareOff">
+          <div class="share-empty">
+            <div class="ic">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/>
+              </svg>
+            </div>
+            <h2>Dolgozzatok együtt ezen a projekten</h2>
+            <p>Ha a haverodnál is fent van a Projekt Hub, ugyanazokat a jegyzeteket,
+               teendőket és a haladást fogjátok látni — mindkettőtök gépén, magától frissülve.</p>
+
+            <div class="steps">
+              <div class="stp"><div class="no">1</div><div class="tx">
+                <b>Készíts egy üres repót GitHubon</b>
+                Csak a megosztásnak kell — a kódod marad ott, ahol most van. Lehet privát is.
+                Ne pipáld be a „Add a README file" opciót.</div></div>
+              <div class="stp"><div class="no">2</div><div class="tx">
+                <b>Illeszd be ide a linkjét</b>
+                Az app feltölti bele a projekt mostani jegyzeteit és haladását.</div></div>
+              <div class="stp"><div class="no">3</div><div class="tx">
+                <b>Add hozzá a haverodat a repóhoz</b>
+                GitHubon: Settings → Collaborators. Utána ő ugyanezt a linket beilleszti magánál,
+                a <em>Csatlakozás közös projekthez</em> gombbal.</div></div>
+            </div>
+
+            <label class="f left"><span>A repó linkje</span>
+              <div class="rw">
+                <input id="shareUrl" type="text" class="mono"
+                       placeholder="https://github.com/felhasznalo/projekt-hub-adatok" />
+                <button id="btnNewRepo" class="btn">Repó létrehozása</button>
+              </div>
+            </label>
+            <div class="rw center mt">
+              <button id="btnShareOn" class="btn pri">Megosztás bekapcsolása</button>
+              <button id="btnJoin" class="btn">Csatlakozás közös projekthez</button>
+            </div>
+            <div id="shareErr" class="errbox hidden"></div>
+            <div id="gitWarn" class="errbox warn hidden"></div>
+          </div>
+        </div>
+
+        <!-- megosztva -->
+        <div id="shareOn" class="hidden">
+          <div class="share-hero">
+            <div class="sh-ic">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/>
+              </svg>
+            </div>
+            <div class="sh-t">
+              <div class="a">Ez a projekt közös</div>
+              <div id="shareRepo" class="b"></div>
+            </div>
+            <div id="syncState" class="syncst"><i></i><span>—</span></div>
+            <button id="btnSyncNow" class="btn">Szinkron most</button>
+          </div>
+
+          <div id="syncErr" class="errbox hidden"></div>
+
+          <div class="cols">
+            <div class="card">
+              <div class="hd">
+                <h2>Tagok <span id="memCount" class="n"></span></h2>
+                <button id="btnInvite" class="btn sm">Meghívás</button>
+              </div>
+              <div id="memberList"></div>
+              <div class="hint mt">
+                A meghíváshoz a haverod GitHub-fiókját hozzá kell adni a repóhoz
+                (<code>Settings → Collaborators</code>), aztán ő a saját Projekt Hubjában
+                a <b>Csatlakozás közös projekthez</b> gombbal beilleszti ugyanezt a linket.
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Mi történt</h2>
+              <div id="feed" class="feed"></div>
+              <div class="hint mt">
+                A <b>fájljaitok nem szinkronizálódnak</b> — csak a jegyzetek, a haladás és a
+                projekt adatai. A kódhoz maradjon a szokásos git a VSCodiumban.
+              </div>
+              <div class="rw mt">
+                <button id="btnShareFolder" class="btn sm gh">Adatmappa</button>
+                <button id="btnShareOpenRepo" class="btn sm gh">Repó GitHubon</button>
+                <button id="btnShareOff" class="btn sm dgr">Megosztás kikapcsolása</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ---------- ESZKOZOK ---------- -->
-      <section class="panel" data-panel="tools">
-        <div class="grid2">
+      <section class="pane" data-panel="tools">
+        <div class="cols">
           <div class="card">
             <h2>XAMPP</h2>
             <div class="svc">
-              <div class="svc-name"><span id="dotApache" class="dot"></span> Apache <span class="muted small">(port 80)</span></div>
-              <div class="row">
-                <button class="tool-btn" data-xampp="apache:start">Indít</button>
-                <button class="tool-btn" data-xampp="apache:stop">Leállít</button>
+              <div class="svc-n"><span id="dotApache" class="dot"></span> Apache <span class="dim">port 80</span></div>
+              <div class="rw">
+                <button class="btn sm" data-xampp="apache:start">Indít</button>
+                <button class="btn sm" data-xampp="apache:stop">Leállít</button>
               </div>
             </div>
             <div class="svc">
-              <div class="svc-name"><span id="dotMysql" class="dot"></span> MySQL <span class="muted small">(port 3306)</span></div>
-              <div class="row">
-                <button class="tool-btn" data-xampp="mysql:start">Indít</button>
-                <button class="tool-btn" data-xampp="mysql:stop">Leállít</button>
+              <div class="svc-n"><span id="dotMysql" class="dot"></span> MySQL <span class="dim">port 3306</span></div>
+              <div class="rw">
+                <button class="btn sm" data-xampp="mysql:start">Indít</button>
+                <button class="btn sm" data-xampp="mysql:stop">Leállít</button>
               </div>
             </div>
-            <div class="row wrap gap">
-              <button id="btnXamppPanel" class="ghost-btn">XAMPP vezérlőpult</button>
-              <button id="btnPhpMyAdmin" class="ghost-btn">phpMyAdmin az appban</button>
-              <button id="btnOpenHtdocs" class="ghost-btn">htdocs mappa</button>
+            <div class="rw wrap mt">
+              <button id="btnXamppPanel" class="btn sm gh">XAMPP vezérlőpult</button>
+              <button id="btnPhpMyAdmin" class="btn sm gh">phpMyAdmin</button>
+              <button id="btnOpenHtdocs" class="btn sm gh">htdocs mappa</button>
             </div>
-            <p class="muted small">Az indítás/leállítás a XAMPP saját .bat scriptjeit hívja. Ha nem történik semmi, indítsd az appot rendszergazdaként.</p>
+            <p class="hint mt">Az indítás a XAMPP saját .bat scriptjeit hívja. Ha nem történik semmi,
+               indítsd az appot rendszergazdaként.</p>
           </div>
 
           <div class="card">
             <h2>Gyors műveletek</h2>
-            <div class="col gap">
-              <button id="btnOpenFolder" class="ghost-btn wide">📁 Projekt mappa megnyitása</button>
-              <button id="btnOpenTerm" class="ghost-btn wide">▶ Parancssor a projektben</button>
-              <button id="btnOpenCodium2" class="ghost-btn wide">🧩 Megnyitás VSCodiumban</button>
-              <button id="btnUploadFiles" class="ghost-btn wide">📤 Kiválasztott fájlok a Drive-ra</button>
-              <button id="btnOpenDrive" class="ghost-btn wide">☁️ Drive mappa megnyitása</button>
+            <div class="stack">
+              <button id="btnOpenFolder" class="btn wide">Projekt mappa megnyitása</button>
+              <button id="btnOpenTerm" class="btn wide">Parancssor a projektben</button>
+              <button id="btnOpenCodium2" class="btn wide">Megnyitás VSCodiumban</button>
+              <button id="btnUploadFiles" class="btn wide">Kiválasztott fájlok a Drive-ra</button>
+              <button id="btnOpenDrive" class="btn wide">Drive mappa megnyitása</button>
             </div>
           </div>
         </div>
@@ -289,83 +387,77 @@
   </main>
 </div>
 
-<!-- ================= BEALLITASOK ================= -->
+<!-- ===================== BEALLITASOK ===================== -->
 <div id="settingsModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2>Beállítások</h2>
-      <button id="btnCloseSettings" class="icon-btn">✕</button>
-    </div>
-    <div class="modal-body">
-      <label class="field">
-        <span>VSCodium futtatható fájl</span>
-        <div class="row">
-          <input id="sVscodium" type="text" class="mono" placeholder="…\VSCodium.exe" />
-          <button class="ghost-btn" data-pick="vscodium">Tallóz</button>
-        </div>
-      </label>
-      <label class="field">
-        <span>XAMPP mappa</span>
-        <div class="row">
-          <input id="sXampp" type="text" class="mono" placeholder="C:\xampp" />
-          <button class="ghost-btn" data-pick="xampp">Tallóz</button>
-        </div>
-      </label>
-      <label class="field">
-        <span>htdocs mappa</span>
-        <div class="row">
-          <input id="sHtdocs" type="text" class="mono" placeholder="C:\xampp\htdocs" />
-          <button class="ghost-btn" data-pick="htdocs">Tallóz</button>
-        </div>
-      </label>
-      <label class="field">
-        <span>Google Drive mappa (Drive for Desktop)</span>
-        <div class="row">
-          <input id="sDrive" type="text" class="mono" placeholder="G:\My Drive" />
-          <button class="ghost-btn" data-pick="drive">Tallóz</button>
-        </div>
-      </label>
-      <div class="row gap wrap">
-        <button id="btnAutodetect" class="ghost-btn">Automatikus felismerés</button>
-        <button id="btnExport" class="ghost-btn">Adatok mentése fájlba</button>
-        <button id="btnImport" class="ghost-btn">Mentés betöltése</button>
+  <div class="mbox">
+    <div class="mhead"><h2>Beállítások</h2><button id="btnCloseSettings" class="ibtn">✕</button></div>
+    <div class="mbody">
+      <div class="mgroup">Te</div>
+      <label class="f"><span>Neved — ezt látják a többiek a közös projekteknél</span>
+        <input id="sMeName" type="text" placeholder="Bence" /></label>
+      <label class="f"><span>GitHub felhasználóneved (nem kötelező)</span>
+        <input id="sMeGithub" type="text" class="mono" placeholder="balindbence" /></label>
+
+      <div class="mgroup">Programok</div>
+      <label class="f"><span>VSCodium futtatható fájl</span>
+        <div class="rw"><input id="sVscodium" type="text" class="mono" placeholder="…\VSCodium.exe" />
+          <button class="btn" data-pick="vscodium">Tallóz</button></div></label>
+      <label class="f"><span>XAMPP mappa</span>
+        <div class="rw"><input id="sXampp" type="text" class="mono" placeholder="C:\xampp" />
+          <button class="btn" data-pick="xampp">Tallóz</button></div></label>
+      <label class="f"><span>htdocs mappa</span>
+        <div class="rw"><input id="sHtdocs" type="text" class="mono" placeholder="C:\xampp\htdocs" />
+          <button class="btn" data-pick="htdocs">Tallóz</button></div></label>
+      <label class="f"><span>Google Drive mappa</span>
+        <div class="rw"><input id="sDrive" type="text" class="mono" placeholder="G:\My Drive" />
+          <button class="btn" data-pick="drive">Tallóz</button></div></label>
+
+      <div class="mgroup">Adatok</div>
+      <div class="rw wrap">
+        <button id="btnAutodetect" class="btn sm gh">Automatikus felismerés</button>
+        <button id="btnExport" class="btn sm gh">Mentés fájlba</button>
+        <button id="btnImport" class="btn sm gh">Mentés betöltése</button>
       </div>
-      <p class="muted small">A „mentés fájlba" hasznos, ha a laptopodon is ugyanazokat a projekteket akarod látni: itt kimented, ott betöltöd.</p>
-      <div id="storeHint" class="muted small mono"></div>
+      <p class="hint mt">A „mentés fájlba" akkor jó, ha a laptopodon is ugyanazokat a projekteket
+         akarod látni. Közös projekthez viszont ne ezt használd, hanem a Megosztás fület.</p>
+      <div id="storeHint" class="hint mono mt"></div>
+      <div id="gitHint" class="hint mono"></div>
     </div>
-    <div class="modal-foot">
-      <button id="btnSaveSettings" class="primary-btn">Mentés</button>
-    </div>
+    <div class="mfoot"><button id="btnSaveSettings" class="btn pri">Mentés</button></div>
   </div>
 </div>
 
-<!-- ================= UJ PROJEKT ================= -->
+<!-- ===================== UJ PROJEKT ===================== -->
 <div id="newModal" class="modal hidden">
-  <div class="modal-box small">
-    <div class="modal-head">
-      <h2>Új projekt</h2>
-      <button id="btnCloseNew" class="icon-btn">✕</button>
+  <div class="mbox sm">
+    <div class="mhead"><h2>Új projekt</h2><button id="btnCloseNew" class="ibtn">✕</button></div>
+    <div class="mbody">
+      <label class="f"><span>Név</span><input id="nName" type="text" placeholder="Portfólió oldal" /></label>
+      <label class="f"><span>Mappa</span>
+        <div class="rw"><input id="nPath" type="text" class="mono" placeholder="C:\xampp\htdocs\portfolio" />
+          <button id="btnNPick" class="btn">Tallóz</button></div></label>
+      <label class="f"><span>Előnézet URL</span>
+        <input id="nPreview" type="text" class="mono" placeholder="http://localhost/portfolio" /></label>
     </div>
-    <div class="modal-body">
-      <label class="field">
-        <span>Név</span>
-        <input id="nName" type="text" placeholder="Portfólió oldal" />
-      </label>
-      <label class="field">
-        <span>Mappa</span>
-        <div class="row">
-          <input id="nPath" type="text" class="mono" placeholder="C:\xampp\htdocs\portfolio" />
-          <button id="btnNPick" class="ghost-btn">Tallóz</button>
-        </div>
-      </label>
-      <label class="field">
-        <span>Előnézet URL</span>
-        <input id="nPreview" type="text" class="mono" placeholder="http://localhost/portfolio" />
-      </label>
+    <div class="mfoot"><button id="btnCreateProject" class="btn pri">Létrehozás</button></div>
+  </div>
+</div>
+
+<!-- ===================== CSATLAKOZAS ===================== -->
+<div id="joinModal" class="modal hidden">
+  <div class="mbox sm">
+    <div class="mhead"><h2>Csatlakozás közös projekthez</h2><button id="btnCloseJoin" class="ibtn">✕</button></div>
+    <div class="mbody">
+      <p class="hint">Illeszd be annak a repónak a linkjét, amit a haverod küldött. Ahhoz, hogy működjön,
+         előbb hozzá kell adnia téged a repóhoz GitHubon (Settings → Collaborators).</p>
+      <label class="f"><span>Repó link</span>
+        <input id="joinUrl" type="text" class="mono" placeholder="https://github.com/haverod/projekt-hub-adatok" /></label>
+      <label class="f"><span>A projekt mappája a te gépeden (nem kötelező)</span>
+        <div class="rw"><input id="joinPath" type="text" class="mono" placeholder="C:\xampp\htdocs\portfolio" />
+          <button id="btnJoinPick" class="btn">Tallóz</button></div></label>
+      <div id="joinErr" class="errbox hidden"></div>
     </div>
-    <div class="modal-foot">
-      <button id="btnCreateProject" class="primary-btn">Létrehozás</button>
-    </div>
+    <div class="mfoot"><button id="btnJoinGo" class="btn pri">Csatlakozás</button></div>
   </div>
 </div>
 

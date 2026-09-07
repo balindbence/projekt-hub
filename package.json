@@ -1,13 +1,14 @@
 {
   "name": "projekt-hub",
-  "version": "1.0.1",
-  "description": "Sajat projekt-vezerlopult: haladas, jegyzetek, beepitett szerkeszto, XAMPP es Drive egy helyen.",
+  "version": "1.2.1",
+  "description": "Sajat projekt-vezerlopult: haladas, jegyzetek, beepitett szerkeszto, XAMPP, Drive es kozos projektek GitHubon keresztul.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
     "pack": "electron-builder --win dir",
-    "dist": "electron-builder --win"
+    "dist": "electron-builder --win",
+    "teszt": "node teszt/megosztas.teszt.js"
   },
   "author": "Bence",
   "license": "MIT",
@@ -38,7 +39,10 @@
       "!*.bat",
       "!*.yml",
       "!README.md",
-      "!LICENSE"
+      "!LICENSE",
+      "!teszt/**",
+      "!*.md",
+      "!ui-*.png"
     ],
     "publish": null,
     "win": {

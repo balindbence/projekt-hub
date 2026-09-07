@@ -9,6 +9,7 @@ const { spawn, exec } = require('child_process');
 const http = require('http');
 const netSocket = require('net');
 const { pathToFileURL } = require('url');
+const megosztas = require('./megosztas');
 
 const APP_ROOT = __dirname;
 const IS_WIN = process.platform === 'win32';
@@ -602,6 +603,58 @@ ipcMain.handle('preview:serve', async (_e, root) => {
 
 ipcMain.handle('preview:stop', async (_e, root) => {
   try { stopPreviewServer(root); return ok(true); } catch (e) { return fail(e); }
+});
+
+// ---------------------------------------------------------------------------
+// Megosztas  (reszletek: megosztas.js)
+//
+// Minden megosztott projekt kap egy sajat, apro git-repot az app adatmappajaban.
+// A projekt SAJAT kodrepojahoz nem nyulunk hozza — lasd a megosztas.js elejen
+// a magyarazatot.
+// ---------------------------------------------------------------------------
+function megosztasMappa(projektId) {
+  const tiszta = String(projektId || '').replace(/[^A-Za-z0-9_-]/g, '') || 'x';
+  return path.join(app.getPath('userData'), 'megosztas', tiszta);
+}
+
+ipcMain.handle('share:git', async () => {
+  try {
+    const g = await megosztas.gitElerheto();
+    const szemely = g.ok ? await megosztas.gitSzemely() : { nev: '', email: '' };
+    return ok({ ok: g.ok, verzio: g.verzio || '', uzenet: g.uzenet || '', szemely });
+  } catch (e) { return fail(e); }
+});
+
+ipcMain.handle('share:sync', async (_e, { projektId, repoUrl, helyi, en }) => {
+  try {
+    const r = await megosztas.szinkron({
+      dir: megosztasMappa(projektId),
+      repoUrl, helyi, en,
+      uzenet: `${(en && en.nev) || 'valaki'} — Projekt Hub`
+    });
+    return ok(r);
+  } catch (e) { return fail(e); }
+});
+
+ipcMain.handle('share:read', async (_e, { projektId, repoUrl, en }) => {
+  try {
+    return ok(await megosztas.beolvas({ dir: megosztasMappa(projektId), repoUrl, en }));
+  } catch (e) { return fail(e); }
+});
+
+ipcMain.handle('share:folder', async (_e, projektId) => {
+  try {
+    const d = megosztasMappa(projektId);
+    await fsp.mkdir(d, { recursive: true });
+    return ok(d);
+  } catch (e) { return fail(e); }
+});
+
+ipcMain.handle('share:detach', async (_e, projektId) => {
+  try {
+    await fsp.rm(megosztasMappa(projektId), { recursive: true, force: true });
+    return ok(true);
+  } catch (e) { return fail(e); }
 });
 
 app.on('before-quit', stopAllPreviewServers);

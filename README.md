@@ -1,141 +1,135 @@
 # Projekt Hub
 
-Saját vezérlőpult a web-projektekhez: haladás, jegyzetek, beépített kódszerkesztő,
-XAMPP-vezérlés, előnézet és Drive-feltöltés — mind egy ablakban.
+A webes projektjeid egy helyen: haladás, jegyzetek, beépített szerkesztő,
+VSCodium- és XAMPP-indítás, Drive-feltöltés — és mostantól **közös projektek**,
+ha a haverodnál is fent van az app.
 
 ---
 
-## Telepítés (ha csak használni akarod)
+## Indítás
 
-Töltsd le a legfrissebb telepítőt a **Releases** oldalról:
+**Ha csak használni akarod:** töltsd le a legfrissebb `Projekt-Hub-…-telepito.exe`-t
+a **Releases** oldalról.
 
-- `Projekt-Hub-1.0.0-win-x64.exe` → telepítő, Start menü + asztali ikon
-- `Projekt-Hub-1.0.0-win-x64-portable.exe` → telepítés nélkül, pendrive-ról is fut
+A Windows kék ablakkal fog rád szólni, mert a fájl nincs aláírva:
+**További információ → Futtatás mindenképp.** Elég egyszer.
 
-A Windows SmartScreen kékre válthat, mert a fájl nincs aláírva (a kódaláíró tanúsítvány
-évi több tízezer forint). **További információ → Futtatás mindenképp.**
+**Fejlesztéshez:** `Inditas.bat` (kell hozzá Node.js).
+**Saját exe:** `App-keszitese.bat` → a `dist` mappába kerül.
 
 ---
 
-## Telepítő készítése magadnak
+## Közös projekt a haveroddal
 
-Kell hozzá Node.js (LTS): https://nodejs.org
+Ha ketten dolgoztok ugyanazon, ugyanazokat a **jegyzeteket, teendőket és a
+haladást** fogjátok látni, mindkettőtök gépén, magától frissülve.
 
-Dupla katt a **`Telepito-keszitese.bat`** fájlra — a végén a `dist` mappában
-ott lesz a telepítő és a hordozható exe.
+### Hogyan
 
-Parancssorból:
+1. **Készíts egy üres repót GitHubon.** Csak a megosztásnak kell — lehet privát.
+   Ne pipáld be az „Add a README file"-t.
+2. A projekt **Megosztás** fülén illeszd be a repó linkjét, és nyomd meg a
+   *Megosztás bekapcsolása* gombot.
+3. GitHubon **Settings → Collaborators**, add hozzá a haverodat.
+4. Ő a saját Projekt Hubjában a **Csatlakozás közös projekthez** gombbal
+   beilleszti ugyanezt a linket.
+
+Ennyi. Nem kell token, nem kell szerver, nem kell regisztrálni sehova — a gépeden
+lévő gitet és a már bejelentkezett GitHub-fiókodat használja.
+
+### Mit oszt meg és mit nem
+
+| Megosztódik | Nem osztódik meg |
+|---|---|
+| jegyzetek, teendők, ki mit zárt le | **a projekt fájljai** |
+| haladás, állapot, határidő, leírás | a beállításaid (XAMPP, Drive útvonalak) |
+| ki mikor mit csinált | a többi projekted |
+
+**A kódotok szándékosan marad ki.** Ha az app a projekted saját repóját
+commitolgatná a háttérben, előbb-utóbb összeakadna a VSCodiumból végzett
+munkáddal, és egy merge konfliktus közepén találnád magad anélkül, hogy kérted
+volna. Ehelyett az app egy külön, pár kilobájtos repót kezel teljesen egyedül.
+A kódhoz maradjon a szokásos git.
+
+### Mi történik, ha egyszerre írtok
+
+Nem vész el semmi. Minden jegyzet külön fájl a repóban, ezért két új jegyzet
+soha nem ütközik. Ha ugyanazt a *mezőt* állítjátok (pl. mindketten a haladást),
+a későbbi nyer — és látod, ki állította.
+
+Ha törölsz egy jegyzetet közös projektben, az nem tűnik el nyomtalanul, hanem
+töröltként megy át a másik gépre. Enélkül a haverod gépe visszahozná a saját
+régi másolatából.
+
+Az app magától szinkronizál: induláskor, ablakra váltáskor, változás után pár
+másodperccel, és hárompercenként. A *Szinkron most* gombbal kézzel is tudod.
+
+### Ha elakad
+
+| Amit látsz | Mi a baj |
+|---|---|
+| „Nem találom a gitet" | telepítsd: git-scm.com |
+| „A GitHub nem engedett be" | nyisd meg egyszer a repót VSCodiumból, hogy a Windows elmentse a belépési adatokat |
+| „Nincs ilyen repó, vagy nincs hozzá jogod" | rossz a link, vagy a haverod még nem vett fel Collaboratornak |
+| „Ez a repó még üres" | a haverod még nem kapcsolta be nála a megosztást |
+
+---
+
+## Mit tud még
+
+**Áttekintés** — egy csíkban a haladás, az állapot, a határidő és a nyitott
+teendők száma. A haladást csúszkával vagy a 0/25/50/75/100 gombokkal állítod.
+
+**Jegyzetek** — teendő, ötlet, hiba, kimaradt funkció; fontosság szerint
+rendezve. Közös projektnél látod, ki írta, és szűrhetsz emberre.
+
+**Kód** — beépített VS Code-motoros szerkesztő gyors javításokhoz. Ctrl+S ment.
+
+**Előnézet** — beépített szerver a sima HTML oldalakhoz (nem kell XAMPP), vagy
+a saját URL, ha PHP van a projektben. Automatikus módban magától eldönti.
+
+**Eszközök** — Apache és MySQL indítása/leállítása, phpMyAdmin, htdocs,
+parancssor a projektben, Drive-feltöltés.
+
+Az adataid itt vannak: `%APPDATA%\Projekt Hub\projekt-hub-data.json`
+A közös projektek adatrepói: `%APPDATA%\Projekt Hub\megosztas\`
+
+---
+
+## Fejlesztéshez
 
 ```
 npm install
-npm run dist
+npm start          # inditas
+npm run teszt      # a megosztas-motor ontesztje (git kell hozza)
+npm run dist       # telepito keszitese
 ```
 
-Fejlesztéshez, telepítő nélkül: `npm start` (vagy `Inditas.bat`).
+A `teszt/megosztas.teszt.js` két „gépet" játszik el egy helyi repóval, GitHub
+nélkül: ellenőrzi, hogy párhuzamos íráskor nem vész el jegyzet, hogy a törlés
+átmegy, és hogy ütköző mezőnél a későbbi nyer. Ha hozzányúlsz a
+`megosztas.js`-hez, ezt futtasd le.
+
+A `teszt/ui.teszt.py` a felületet kattintja végig Chromiumban hamis
+adatforrással (kell hozzá `pip install playwright`).
 
 ---
 
-## GitHub: hogy a laptopodra is egy kattintás legyen
+## Fájlok
 
-Egyszeri beállítás:
-
-Előbb dupla katt a **`Github-elokeszites.bat`** fájlra — ez teszi a helyére a
-`.github\workflows\build.yml`-t (ez mondja meg a GitHubnak, hogyan építse az appot).
-
-```
-cd C:\Users\Bence\source\projekt-hub
-git init
-git add .
-git commit -m "Projekt Hub 1.0"
-git branch -M main
-git remote add origin https://github.com/FELHASZNALONEVED/projekt-hub.git
-git push -u origin main
-```
-
-(A repót előbb hozd létre a github.com-on — üresen, README nélkül.)
-
-Innentől, ha új verziót akarsz kiadni:
-
-```
-git add .
-git commit -m "mi valtozott"
-git tag v1.0.1
-git push && git push --tags
-```
-
-A `.github/workflows/build.yml` erre magától elindul: egy Windows gépen lefordítja
-az appot, és felteszi a telepítőt a **Releases** oldalra. Kb. 5 perc, utána a laptopodon
-csak letöltöd az `.exe`-t. Nem kell rajta se Node.js, se semmi.
-
-Kézzel is indíthatod: GitHub → **Actions** → *Build* → *Run workflow*. Ilyenkor a kész
-fájl a futás alján, az „Artifacts" résznél lesz.
-
-> Fontos: a `package.json`-ban lévő `version` és a git tag maradjon szinkronban
-> (`"version": "1.0.1"` → `git tag v1.0.1`).
-
----
-
-## Beállítások (bal alul a ⚙️)
-
-Az app első induláskor megpróbálja magától megtalálni ezeket, de nézd át:
-
-| Mező | Mi ez |
+| Fájl | Mi van benne |
 |---|---|
-| VSCodium futtatható fájl | pl. `C:\Users\Bence\AppData\Local\Programs\VSCodium\VSCodium.exe` |
-| XAMPP mappa | általában `C:\xampp` |
-| htdocs mappa | `C:\xampp\htdocs` |
-| Google Drive mappa | a Drive for Desktop meghajtója, pl. `G:\My Drive` vagy `G:\Saját meghajtó` |
+| `main.js` | Electron főfolyamat: fájlkezelés, XAMPP, Drive, előnézet-szerver |
+| `megosztas.js` | a közös projektek git-alapú szinkronja — a logika itt van |
+| `preload.js` | a híd a felület és a főfolyamat között |
+| `src/index.html` | a felület szerkezete |
+| `src/styles.css` | a kinézet |
+| `src/renderer.js` | a felület logikája |
 
-## Mit tud
+---
 
-**Áttekintés** — százalékos haladás (te állítod a csúszkával vagy a 0/25/50/75/100 gombokkal),
-állapot, határidő visszaszámlálóval, leírás, és a legfontosabb nyitott teendők.
+## Új verzió kiadása
 
-**Kód** — fájlfa + beépített VS Code-motoros szerkesztő (Monaco). Ctrl+S ment.
-Gyors javításokhoz; komolyabb munkához a fenti **VSCodium** gomb megnyitja
-a projektmappát a VSCodiumban.
-
-**Jegyzetek** — ide írod fel, ha egy funkció kimaradt. Típus (teendő / ötlet / hiba /
-kimaradt funkció) és prioritás. A nyitott elemek száma a fülön és a projektlistában is látszik.
-
-**Előnézet** — az oldalad az appon belül nyílik meg, vissza/előre/frissítés gombokkal.
-Három mód közül választhatsz a fenti legördülőben:
-
-- **Automatikus** (alapértelmezett) — megnézi a projektet: ha talál `.php` fájlt, a megadott
-  XAMPP-címet nyitja meg; ha csak HTML/CSS/JS van, a beépített szervert használja.
-- **Beépített szerver** — az app saját mini webszervere szolgálja ki a projektmappát egy szabad
-  localhost porton. Sima HTML oldalhoz **nem kell XAMPP**, nem kell a htdocs-ba másolni semmit.
-- **Saját URL / XAMPP** — a megadott címet tölti be (PHP, adatbázis, vagy máshol futó szerver).
-
-A phpMyAdmin is itt fut, nem külön ablakban.
-
-**Eszközök** — Apache és MySQL indítása/leállítása, élő státusz (a 80-as és 3306-os port
-figyelésével), XAMPP vezérlőpult, projektmappa, parancssor a projektben, Drive-műveletek, napló.
-
-## Drive-feltöltés
-
-A Drive for Desktop mappájába másol. A projekt **Drive almappa** mezője adja meg,
-hova (pl. `Suli/Web/Portfolio`). A Drive kliens onnantól magától szinkronizál.
-
-- A `node_modules`, `.git`, `vendor`, `dist`, `build` mappákat kihagyja.
-- Másolás, nem tükrözés: a Drive-ból nem töröl semmit.
-- A ⬆ Drive gomb az egész projektet viszi; az Eszközök fülön van
-  „Kiválasztott fájlok a Drive-ra" is.
-
-## Adatok két gép között
-
-A projektek, százalékok és jegyzetek egy JSON fájlban vannak:
-`%APPDATA%\Projekt Hub\projekt-hub-data.json`
-(a pontos utat a Beállítások ablak alján kiírja).
-
-A Beállításokban van **„Adatok mentése fájlba"** és **„Mentés betöltése"** — ha a
-mentést a Drive mappádba teszed, a laptopon egy kattintással behúzod ugyanazokat
-a projekteket. (Az elérési utak gépenként eltérhetnek, azokat ott át kell írni.)
-
-## Ha valami nem megy
-
-- **A XAMPP indító gomb nem csinál semmit** → indítsd az appot rendszergazdaként,
-  vagy használd a XAMPP vezérlőpult gombot.
-- **A VSCodium gomb hibát ír** → add meg kézzel az elérési utat a Beállításokban.
-- **Az előnézet üres** → fut az Apache? (fent a pötty zöld?) Jó az URL?
-- **A szerkesztő nem tölt be** (fejlesztői módban) → futtasd újra: `npm install`.
+1. `GitHub-feltoltes.bat` — egyszeri beállítás.
+2. Utána bármikor: `Frissites-feltoltese.bat` — emeli a verziószámot, feltölti,
+   és a GitHub megépíti az új telepítőt a Releases oldalra.

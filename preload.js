@@ -46,6 +46,13 @@ contextBridge.exposeInMainWorld('api', {
     serve: (root) => call('preview:serve', root),
     stop: (root) => call('preview:stop', root)
   },
+  megosztas: {
+    git: () => call('share:git'),
+    szinkron: (payload) => call('share:sync', payload),
+    beolvas: (payload) => call('share:read', payload),
+    mappa: (projektId) => call('share:folder', projektId),
+    leval: (projektId) => call('share:detach', projektId)
+  },
   platform: process.platform,
   sep: process.platform === 'win32' ? '\\' : '/'
 });
